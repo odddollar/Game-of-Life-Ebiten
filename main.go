@@ -13,7 +13,7 @@ const (
 	gridWidth          = 100
 	gridHeight         = 75
 	cellSize           = 8
-	probInitiallyAlive = 0.8
+	probInitiallyAlive = 0.2
 )
 
 // Game struct to hold current state
@@ -52,7 +52,7 @@ func NewGame() *Game {
 func (g *Game) initialiseRandomAlivePositions() {
 	for y := range g.height {
 		for x := range g.width {
-			g.currentGrid[y][x] = rand.Float64() > probInitiallyAlive
+			g.currentGrid[y][x] = rand.Float64() < probInitiallyAlive
 		}
 	}
 }
@@ -90,7 +90,25 @@ func (g *Game) numNeighbours(x, y int) int {
 
 // Step to next state
 func (g *Game) step() {
+	// Iterate through each grid position
+	for y := range g.height {
+		for x := range g.width {
+			// If cell has 2 neighbours then leave as is
+			// Otherwise make cell alive if it has 3 neighbours
+			switch g.numNeighbours(x, y) {
+			case 2:
+				g.nextGrid[y][x] = g.currentGrid[y][x]
+			case 3:
+				g.nextGrid[y][x] = true
+			default:
+				g.nextGrid[y][x] = false
+			}
+		}
+	}
 
+	// Make next grid current one
+	// Double buffering
+	g.currentGrid, g.nextGrid = g.nextGrid, g.currentGrid
 }
 
 // Update current game frame
@@ -153,6 +171,7 @@ func (g *Game) Layout(_, _ int) (int, int) {
 func main() {
 	// Setup game window
 	ebiten.SetWindowTitle("Game of Life (Ebitengine)")
+	ebiten.SetWindowSize(1000, 750)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
 	// Run game
