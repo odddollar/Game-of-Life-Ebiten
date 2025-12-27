@@ -5,15 +5,15 @@ import (
 	"math/rand/v2"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
-// White pixel used by alive cells
-var whitePixel *ebiten.Image
-
-func initWhitePixel() {
-	whitePixel = ebiten.NewImage(1, 1)
-	whitePixel.Fill(color.White)
-}
+const (
+	gridWidth          = 100
+	gridHeight         = 75
+	cellSize           = 8
+	probInitiallyAlive = 0.8
+)
 
 // Game struct to hold current state
 type Game struct {
@@ -24,7 +24,7 @@ type Game struct {
 }
 
 // Create new game object
-func NewGame(gridWidth, gridHeight, probInitiallyAlive int) *Game {
+func NewGame() *Game {
 	// Create two 2D arrays of equal size
 	g1 := make([][]bool, gridHeight)
 	g2 := make([][]bool, gridHeight)
@@ -37,7 +37,7 @@ func NewGame(gridWidth, gridHeight, probInitiallyAlive int) *Game {
 	// Initial random positions of first grid
 	for y := range gridHeight {
 		for x := range gridWidth {
-			g1[y][x] = rand.IntN(100) > probInitiallyAlive
+			g1[y][x] = rand.Float64() > probInitiallyAlive
 		}
 	}
 
@@ -56,11 +56,31 @@ func (g *Game) Update() error {
 	return nil
 }
 
-// Draw current frame
-func (g *Game) Draw(screen *ebiten.Image) {}
+// Draw current grid
+func (g *Game) Draw(screen *ebiten.Image) {
+	for y := range g.height {
+		for x := range g.width {
+			// Skip current cell if not alive
+			if !g.currentGrid[y][x] {
+				continue
+			}
+
+			// Draw cell
+			vector.FillRect(
+				screen,
+				float32(x*cellSize),
+				float32(y*cellSize),
+				cellSize,
+				cellSize,
+				color.White,
+				false,
+			)
+		}
+	}
+}
 
 // Set internal canvas size
-func (g *Game) Layout(w, h int) (int, int) {
+func (g *Game) Layout(_, _ int) (int, int) {
 	return 800, 600
 }
 
@@ -70,7 +90,7 @@ func main() {
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
 	// Run game
-	if err := ebiten.RunGame(NewGame(100, 75, 80)); err != nil {
+	if err := ebiten.RunGame(NewGame()); err != nil {
 		panic(err)
 	}
 }
