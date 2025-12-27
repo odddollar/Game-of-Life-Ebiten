@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	gWidth             = 1000
-	gHeight            = 750
+	gWidth             = 800
+	gHeight            = 600
 	cSize              = 8
 	probInitiallyAlive = 0.2
 )
@@ -23,6 +23,7 @@ type Game struct {
 	gridWidth, gridHeight int
 	cellSize              int
 	image                 *ebiten.Image
+	imageWidth            int
 	pixels                []byte
 }
 
@@ -50,6 +51,7 @@ func NewGame() *Game {
 		gridHeight:  gHeight,
 		cellSize:    cSize,
 		image:       ebiten.NewImage(imageWidth, imageHeight),
+		imageWidth:  gWidth * cSize,
 		pixels:      make([]byte, imageWidth*imageHeight*4),
 	}
 	g.initialiseRandomAlivePositions()
@@ -175,7 +177,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			py := gridY * g.cellSize
 
 			for cy := range g.cellSize {
-				row := ((py+cy)*(g.gridWidth*g.cellSize) + px) * 4
+				row := ((py+cy)*g.imageWidth + px) * 4
 				for cx := range g.cellSize {
 					i := row + cx*4
 					g.pixels[i] = 0xff
