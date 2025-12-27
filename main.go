@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	gWidth             = 100
-	gHeight            = 75
+	gWidth             = 800
+	gHeight            = 600
 	probInitiallyAlive = 0.2
 )
 
