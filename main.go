@@ -2,12 +2,10 @@ package main
 
 import (
 	"fmt"
-	"image/color"
 	"math/rand/v2"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 const (
@@ -24,6 +22,8 @@ type Game struct {
 	running               bool
 	gridWidth, gridHeight int
 	cellSize              int
+	image                 *ebiten.Image
+	pixels                []byte
 }
 
 // Create new game object
@@ -37,6 +37,10 @@ func NewGame() *Game {
 		g2[i] = make([]bool, gWidth)
 	}
 
+	// Calculate dimensions of image to draw
+	imageWidth := gWidth * cSize
+	imageHeight := gHeight * cSize
+
 	// Create new game struct in running state
 	g := &Game{
 		currentGrid: g1,
@@ -45,6 +49,8 @@ func NewGame() *Game {
 		gridWidth:   gWidth,
 		gridHeight:  gHeight,
 		cellSize:    cSize,
+		image:       ebiten.NewImage(imageWidth, imageHeight),
+		pixels:      make([]byte, imageWidth*imageHeight*4),
 	}
 	g.initialiseRandomAlivePositions()
 
@@ -153,6 +159,9 @@ func (g *Game) Update() error {
 
 // Draw current state to screen
 func (g *Game) Draw(screen *ebiten.Image) {
+	// Clear pixel buffer
+	clear(g.pixels)
+
 	// Draw current grid
 	for gridY := range g.gridHeight {
 		for gridX := range g.gridWidth {
@@ -161,18 +170,26 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				continue
 			}
 
-			// Draw cell
-			vector.FillRect(
-				screen,
-				float32(gridX*g.cellSize),
-				float32(gridY*g.cellSize),
-				float32(g.cellSize),
-				float32(g.cellSize),
-				color.White,
-				false,
-			)
+			// Calculate position of cell in image
+			px := gridX * g.cellSize
+			py := gridY * g.cellSize
+
+			for cy := range g.cellSize {
+				row := ((py+cy)*(g.gridWidth*g.cellSize) + px) * 4
+				for cx := range g.cellSize {
+					i := row + cx*4
+					g.pixels[i] = 0xff
+					g.pixels[i+1] = 0xff
+					g.pixels[i+2] = 0xff
+					g.pixels[i+3] = 0xff
+				}
+			}
 		}
 	}
+
+	// Draw pixels to screen
+	g.image.WritePixels(g.pixels)
+	screen.DrawImage(g.image, nil)
 }
 
 // Set internal canvas size
