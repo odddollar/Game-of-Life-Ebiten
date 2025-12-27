@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"math/rand/v2"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
@@ -67,6 +69,7 @@ func (g *Game) isAlive(x, y int) bool {
 	return g.currentGrid[y][x]
 }
 
+// Get number of neighbours around position, with wrapping
 func (g *Game) numNeighbours(x, y int) int {
 	neighbours := 0
 
@@ -140,8 +143,9 @@ func (g *Game) Update() error {
 	return nil
 }
 
-// Draw current grid
+// Draw current state to screen
 func (g *Game) Draw(screen *ebiten.Image) {
+	// Draw current grid
 	for y := range g.height {
 		for x := range g.width {
 			// Skip current cell if not alive
@@ -161,6 +165,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			)
 		}
 	}
+
+	// Overlay TPS and FPS
+	ebitenutil.DebugPrint(
+		screen,
+		fmt.Sprintf(
+			"FPS: %.2f\nTPS: %.2f",
+			ebiten.ActualFPS(),
+			ebiten.ActualTPS(),
+		),
+	)
 }
 
 // Set internal canvas size
