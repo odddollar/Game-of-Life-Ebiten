@@ -2,6 +2,7 @@ package main
 
 import (
 	"image/color"
+	"math/rand/v2"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -23,8 +24,31 @@ type Game struct {
 }
 
 // Create new game object
-func NewGame(gridWidth, gridHeight int) *Game {
-	return &Game{}
+func NewGame(gridWidth, gridHeight, probInitiallyAlive int) *Game {
+	// Create two 2D arrays of equal size
+	g1 := make([][]bool, gridHeight)
+	g2 := make([][]bool, gridHeight)
+
+	for i := range gridHeight {
+		g1[i] = make([]bool, gridWidth)
+		g2[i] = make([]bool, gridWidth)
+	}
+
+	// Initial random positions of first grid
+	for y := range gridHeight {
+		for x := range gridWidth {
+			g1[y][x] = rand.IntN(100) > probInitiallyAlive
+		}
+	}
+
+	// Create new game struct in running state
+	return &Game{
+		currentGrid: g1,
+		nextGrid:    g2,
+		running:     true,
+		width:       gridWidth,
+		height:      gridHeight,
+	}
 }
 
 // Update current game frame
@@ -42,11 +66,11 @@ func (g *Game) Layout(w, h int) (int, int) {
 
 func main() {
 	// Setup game window
-	ebiten.SetWindowSize(800, 600)
 	ebiten.SetWindowTitle("Game of Life (Ebitengine)")
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
 	// Run game
-	if err := ebiten.RunGame(NewGame(100, 75)); err != nil {
+	if err := ebiten.RunGame(NewGame(100, 75, 80)); err != nil {
 		panic(err)
 	}
 }
