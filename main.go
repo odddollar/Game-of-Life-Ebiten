@@ -6,14 +6,13 @@ import (
 	"math/rand/v2"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 const (
-	gridWidth          = 100
-	gridHeight         = 75
+	gridWidth          = 1000
+	gridHeight         = 750
 	cellSize           = 8
 	probInitiallyAlive = 0.2
 )
@@ -116,6 +115,13 @@ func (g *Game) step() {
 
 // Update current game frame
 func (g *Game) Update() error {
+	// Update window title with TPS/FPS
+	ebiten.SetWindowTitle(fmt.Sprintf(
+		"Game of Life (Ebitengine) (FPS: %.2f, TPS: %.2f)",
+		ebiten.ActualFPS(),
+		ebiten.ActualTPS(),
+	))
+
 	// Toggle pause input
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		g.running = !g.running
@@ -165,16 +171,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			)
 		}
 	}
-
-	// Overlay TPS and FPS
-	ebitenutil.DebugPrint(
-		screen,
-		fmt.Sprintf(
-			"FPS: %.2f\nTPS: %.2f",
-			ebiten.ActualFPS(),
-			ebiten.ActualTPS(),
-		),
-	)
 }
 
 // Set internal canvas size
@@ -184,7 +180,6 @@ func (g *Game) Layout(_, _ int) (int, int) {
 
 func main() {
 	// Setup game window
-	ebiten.SetWindowTitle("Game of Life (Ebitengine)")
 	ebiten.SetWindowSize(1000, 750)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
