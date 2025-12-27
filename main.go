@@ -9,9 +9,8 @@ import (
 )
 
 const (
-	gWidth             = 800
-	gHeight            = 600
-	cSize              = 8
+	gWidth             = 100
+	gHeight            = 75
 	probInitiallyAlive = 0.2
 )
 
@@ -21,9 +20,7 @@ type Game struct {
 	nextGrid              [][]bool
 	running               bool
 	gridWidth, gridHeight int
-	cellSize              int
 	image                 *ebiten.Image
-	imageWidth            int
 	pixels                []byte
 }
 
@@ -38,10 +35,6 @@ func NewGame() *Game {
 		g2[i] = make([]bool, gWidth)
 	}
 
-	// Calculate dimensions of image to draw
-	imageWidth := gWidth * cSize
-	imageHeight := gHeight * cSize
-
 	// Create new game struct in running state
 	g := &Game{
 		currentGrid: g1,
@@ -49,10 +42,8 @@ func NewGame() *Game {
 		running:     true,
 		gridWidth:   gWidth,
 		gridHeight:  gHeight,
-		cellSize:    cSize,
-		image:       ebiten.NewImage(imageWidth, imageHeight),
-		imageWidth:  gWidth * cSize,
-		pixels:      make([]byte, imageWidth*imageHeight*4),
+		image:       ebiten.NewImage(gWidth, gHeight),
+		pixels:      make([]byte, gWidth*gHeight*4),
 	}
 	g.initialiseRandomAlivePositions()
 
@@ -70,10 +61,8 @@ func (g *Game) initialiseRandomAlivePositions() {
 
 // Get alive state at position with wrapping
 func (g *Game) isAlive(x, y int) bool {
-	x += g.gridWidth
-	x %= g.gridWidth
-	y += g.gridHeight
-	y %= g.gridHeight
+	x = (x + g.gridWidth) % g.gridWidth
+	y = (y + g.gridHeight) % g.gridHeight
 
 	return g.currentGrid[y][x]
 }
@@ -164,7 +153,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Clear pixel buffer
 	clear(g.pixels)
 
-	// Draw current grid
+	// Draw current grid to buffer
 	for gridY := range g.gridHeight {
 		for gridX := range g.gridWidth {
 			// Skip current cell if not alive
@@ -172,31 +161,32 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				continue
 			}
 
-			// Calculate position of cell in image
-			px := gridX * g.cellSize
-			py := gridY * g.cellSize
-
-			for cy := range g.cellSize {
-				row := ((py+cy)*g.imageWidth + px) * 4
-				for cx := range g.cellSize {
-					i := row + cx*4
-					g.pixels[i] = 0xff
-					g.pixels[i+1] = 0xff
-					g.pixels[i+2] = 0xff
-					g.pixels[i+3] = 0xff
-				}
-			}
+			i := (gridY*g.gridWidth + gridX) * 4
+			g.pixels[i+0] = 255
+			g.pixels[i+1] = 255
+			g.pixels[i+2] = 255
+			g.pixels[i+3] = 255
 		}
 	}
 
-	// Draw pixels to screen
+	// Write pixel array to image
 	g.image.WritePixels(g.pixels)
+
+	// Calculate scaling factors
+	sw, sh := screen.Bounds().Dx(), screen.Bounds().Dy()
+	scaleX := float64(sw) / float64(g.gridWidth)
+	scaleY := float64(sh) / float64(g.gridHeight)
+
+	// Create scaling matrix
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Scale(scaleX, scaleY)
+
 	screen.DrawImage(g.image, nil)
 }
 
 // Set internal canvas size
 func (g *Game) Layout(_, _ int) (int, int) {
-	return g.gridWidth * g.cellSize, g.gridHeight * g.cellSize
+	return g.gridWidth, g.gridHeight
 }
 
 func main() {
