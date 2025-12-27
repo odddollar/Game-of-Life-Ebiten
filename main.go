@@ -5,6 +5,7 @@ import (
 	"math/rand/v2"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
@@ -34,25 +35,49 @@ func NewGame() *Game {
 		g2[i] = make([]bool, gridWidth)
 	}
 
-	// Initial random positions of first grid
-	for y := range gridHeight {
-		for x := range gridWidth {
-			g1[y][x] = rand.Float64() > probInitiallyAlive
-		}
-	}
-
 	// Create new game struct in running state
-	return &Game{
+	g := &Game{
 		currentGrid: g1,
 		nextGrid:    g2,
 		running:     true,
 		width:       gridWidth,
 		height:      gridHeight,
 	}
+	g.initialiseRandomAlivePositions()
+
+	return g
+}
+
+// Initialise random alive positions
+func (g *Game) initialiseRandomAlivePositions() {
+	for y := range g.height {
+		for x := range g.width {
+			g.currentGrid[y][x] = rand.Float64() > probInitiallyAlive
+		}
+	}
 }
 
 // Update current game frame
 func (g *Game) Update() error {
+	// Toggle pause
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		g.running = !g.running
+	}
+
+	// Randomise grid
+	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
+		g.initialiseRandomAlivePositions()
+	}
+
+	// Clear grid
+	if inpututil.IsKeyJustPressed(ebiten.KeyC) {
+		for y := range g.height {
+			for x := range g.width {
+				g.currentGrid[y][x] = false
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -81,7 +106,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 // Set internal canvas size
 func (g *Game) Layout(_, _ int) (int, int) {
-	return 800, 600
+	return gridWidth * cellSize, gridHeight * cellSize
 }
 
 func main() {
