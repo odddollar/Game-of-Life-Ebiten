@@ -11,29 +11,30 @@ import (
 )
 
 const (
-	gridWidth          = 1000
-	gridHeight         = 750
-	cellSize           = 8
+	gWidth             = 1000
+	gHeight            = 750
+	cSize              = 8
 	probInitiallyAlive = 0.2
 )
 
 // Game struct to hold current state
 type Game struct {
-	currentGrid   [][]bool
-	nextGrid      [][]bool
-	running       bool
-	width, height int
+	currentGrid           [][]bool
+	nextGrid              [][]bool
+	running               bool
+	gridWidth, gridHeight int
+	cellSize              int
 }
 
 // Create new game object
 func NewGame() *Game {
 	// Create two 2D arrays of equal size
-	g1 := make([][]bool, gridHeight)
-	g2 := make([][]bool, gridHeight)
+	g1 := make([][]bool, gHeight)
+	g2 := make([][]bool, gHeight)
 
-	for i := range gridHeight {
-		g1[i] = make([]bool, gridWidth)
-		g2[i] = make([]bool, gridWidth)
+	for i := range gHeight {
+		g1[i] = make([]bool, gWidth)
+		g2[i] = make([]bool, gWidth)
 	}
 
 	// Create new game struct in running state
@@ -41,8 +42,9 @@ func NewGame() *Game {
 		currentGrid: g1,
 		nextGrid:    g2,
 		running:     true,
-		width:       gridWidth,
-		height:      gridHeight,
+		gridWidth:   gWidth,
+		gridHeight:  gHeight,
+		cellSize:    cSize,
 	}
 	g.initialiseRandomAlivePositions()
 
@@ -51,8 +53,8 @@ func NewGame() *Game {
 
 // Initialise random alive positions
 func (g *Game) initialiseRandomAlivePositions() {
-	for y := range g.height {
-		for x := range g.width {
+	for y := range g.gridHeight {
+		for x := range g.gridWidth {
 			g.currentGrid[y][x] = rand.Float64() < probInitiallyAlive
 		}
 	}
@@ -60,10 +62,10 @@ func (g *Game) initialiseRandomAlivePositions() {
 
 // Get alive state at position with wrapping
 func (g *Game) isAlive(x, y int) bool {
-	x += g.width
-	x %= g.width
-	y += g.height
-	y %= g.height
+	x += g.gridWidth
+	x %= g.gridWidth
+	y += g.gridHeight
+	y %= g.gridHeight
 
 	return g.currentGrid[y][x]
 }
@@ -93,8 +95,8 @@ func (g *Game) numNeighbours(x, y int) int {
 // Step to next state
 func (g *Game) step() {
 	// Iterate through each grid position
-	for y := range g.height {
-		for x := range g.width {
+	for y := range g.gridHeight {
+		for x := range g.gridWidth {
 			// If cell has 2 neighbours then leave as is
 			// Otherwise make cell alive if it has 3 neighbours
 			switch g.numNeighbours(x, y) {
@@ -134,8 +136,8 @@ func (g *Game) Update() error {
 
 	// Clear grid input
 	if inpututil.IsKeyJustPressed(ebiten.KeyC) {
-		for y := range g.height {
-			for x := range g.width {
+		for y := range g.gridHeight {
+			for x := range g.gridWidth {
 				g.currentGrid[y][x] = false
 			}
 		}
@@ -152,20 +154,20 @@ func (g *Game) Update() error {
 // Draw current state to screen
 func (g *Game) Draw(screen *ebiten.Image) {
 	// Draw current grid
-	for y := range g.height {
-		for x := range g.width {
+	for gridY := range g.gridHeight {
+		for gridX := range g.gridWidth {
 			// Skip current cell if not alive
-			if !g.currentGrid[y][x] {
+			if !g.currentGrid[gridY][gridX] {
 				continue
 			}
 
 			// Draw cell
 			vector.FillRect(
 				screen,
-				float32(x*cellSize),
-				float32(y*cellSize),
-				cellSize,
-				cellSize,
+				float32(gridX*g.cellSize),
+				float32(gridY*g.cellSize),
+				float32(g.cellSize),
+				float32(g.cellSize),
 				color.White,
 				false,
 			)
@@ -175,7 +177,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 // Set internal canvas size
 func (g *Game) Layout(_, _ int) (int, int) {
-	return gridWidth * cellSize, gridHeight * cellSize
+	return g.gridWidth * g.cellSize, g.gridHeight * g.cellSize
 }
 
 func main() {
