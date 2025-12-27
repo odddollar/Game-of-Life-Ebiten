@@ -18,10 +18,12 @@ const (
 type Game struct {
 	currentGrid           [][]bool
 	nextGrid              [][]bool
-	running               bool
 	gridWidth, gridHeight int
 	image                 *ebiten.Image
 	pixels                []byte
+	running               bool
+	framesPerRefresh      int
+	currentFrameCount     int
 }
 
 // Create new game object
@@ -37,13 +39,15 @@ func NewGame() *Game {
 
 	// Create new game struct in running state
 	g := &Game{
-		currentGrid: g1,
-		nextGrid:    g2,
-		running:     true,
-		gridWidth:   gWidth,
-		gridHeight:  gHeight,
-		image:       ebiten.NewImage(gWidth, gHeight),
-		pixels:      make([]byte, gWidth*gHeight*4),
+		currentGrid:       g1,
+		nextGrid:          g2,
+		gridWidth:         gWidth,
+		gridHeight:        gHeight,
+		image:             ebiten.NewImage(gWidth, gHeight),
+		pixels:            make([]byte, gWidth*gHeight*4),
+		running:           true,
+		framesPerRefresh:  5,
+		currentFrameCount: 1,
 	}
 	g.initialiseRandomAlivePositions()
 
@@ -142,7 +146,13 @@ func (g *Game) Update() error {
 
 	// Update grid
 	if g.running {
-		g.step()
+		if g.currentFrameCount%g.framesPerRefresh == 0 {
+			g.step()
+			g.currentFrameCount = 1
+		} else {
+			g.currentFrameCount++
+		}
+		fmt.Println(g.currentFrameCount)
 	}
 
 	return nil
