@@ -57,25 +57,66 @@ func (g *Game) initialiseRandomAlivePositions() {
 	}
 }
 
+// Get alive state at position with wrapping
+func (g *Game) isAlive(x, y int) bool {
+	x += g.width
+	x %= g.width
+	y += g.height
+	y %= g.height
+
+	return g.currentGrid[y][x]
+}
+
+func (g *Game) numNeighbours(x, y int) int {
+	neighbours := 0
+
+	// Iterate through all spaces around (x, y) co-ordinates
+	for i := -1; i <= 1; i++ {
+		for j := -1; j <= 1; j++ {
+			// Skip current position
+			if i == 0 && j == 0 {
+				continue
+			}
+
+			// Check alive state of neighbour
+			if g.isAlive(x+i, y+j) {
+				neighbours++
+			}
+		}
+	}
+
+	return neighbours
+}
+
+// Step to next state
+func (g *Game) step() {
+
+}
+
 // Update current game frame
 func (g *Game) Update() error {
-	// Toggle pause
+	// Toggle pause input
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		g.running = !g.running
 	}
 
-	// Randomise grid
+	// Randomise grid input
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		g.initialiseRandomAlivePositions()
 	}
 
-	// Clear grid
+	// Clear grid input
 	if inpututil.IsKeyJustPressed(ebiten.KeyC) {
 		for y := range g.height {
 			for x := range g.width {
 				g.currentGrid[y][x] = false
 			}
 		}
+	}
+
+	// Update grid
+	if g.running {
+		g.step()
 	}
 
 	return nil
