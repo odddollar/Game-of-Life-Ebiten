@@ -9,9 +9,11 @@ import (
 )
 
 const (
-	gWidth             = 800
-	gHeight            = 600
+	gWidth             = 400
+	gHeight            = 300
 	probInitiallyAlive = 0.2
+	nSteppingSpeed     = 20
+	xSteppingSpeed     = 1
 )
 
 // Game struct to hold current state
@@ -22,7 +24,9 @@ type Game struct {
 	image                 *ebiten.Image
 	pixels                []byte
 	running               bool
-	framesPerRefresh      int
+	steppingSpeed         int
+	minSteppingSpeed      int
+	maxSteppingSpeed      int
 	currentFrameCount     int
 }
 
@@ -46,7 +50,9 @@ func NewGame() *Game {
 		image:             ebiten.NewImage(gWidth, gHeight),
 		pixels:            make([]byte, gWidth*gHeight*4),
 		running:           true,
-		framesPerRefresh:  5,
+		steppingSpeed:     10,
+		minSteppingSpeed:  nSteppingSpeed,
+		maxSteppingSpeed:  xSteppingSpeed,
 		currentFrameCount: 1,
 	}
 	g.initialiseRandomAlivePositions()
@@ -120,7 +126,8 @@ func (g *Game) step() {
 func (g *Game) Update() error {
 	// Update window title with TPS/FPS
 	ebiten.SetWindowTitle(fmt.Sprintf(
-		"Game of Life (Ebitengine) (FPS: %.2f, TPS: %.2f)",
+		"Game of Life (Ebitengine) (Stepping Speed: %d) (FPS: %.2f, TPS: %.2f)",
+		g.steppingSpeed,
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
 	))
@@ -144,15 +151,23 @@ func (g *Game) Update() error {
 		}
 	}
 
+	// Change stepping speed
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) && g.steppingSpeed > g.maxSteppingSpeed {
+		g.steppingSpeed--
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) && g.steppingSpeed < g.minSteppingSpeed {
+		g.steppingSpeed++
+	}
+	fmt.Println(g.steppingSpeed)
+
 	// Update grid
 	if g.running {
-		if g.currentFrameCount%g.framesPerRefresh == 0 {
+		if g.currentFrameCount%g.steppingSpeed == 0 {
 			g.step()
 			g.currentFrameCount = 1
 		} else {
 			g.currentFrameCount++
 		}
-		fmt.Println(g.currentFrameCount)
 	}
 
 	return nil
