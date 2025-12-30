@@ -21,9 +21,9 @@ const (
 )
 
 // Load generic font with size
-func loadFont(size float64) (text.Face, error) {
+func loadFont(size float64) text.Face {
 	s, _ := text.NewGoTextFaceSource(bytes.NewReader(goregular.TTF))
-	return &text.GoTextFace{Source: s, Size: size}, nil
+	return &text.GoTextFace{Source: s, Size: size}
 }
 
 func main() {

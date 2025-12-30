@@ -7,23 +7,12 @@ import (
 	"github.com/ebitenui/ebitenui/widget"
 )
 
+// Create floating window with stats about current simulation
 func createStatsWindow() (*widget.Window, *widget.Text) {
-	titleFace, _ := loadFont(22)
-	bodyFace, _ := loadFont(20)
+	titleFace := loadFont(22)
+	bodyFace := loadFont(20)
 
-	statsText := widget.NewText(
-		widget.TextOpts.Text("", &bodyFace, color.White),
-		widget.TextOpts.Padding(&widget.Insets{Left: 4, Top: 1}),
-	)
-
-	content := widget.NewContainer(
-		widget.ContainerOpts.BackgroundImage(
-			e_image.NewNineSliceColor(color.NRGBA{40, 40, 40, 220}),
-		),
-		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
-	)
-	content.AddChild(statsText)
-
+	// Create title container and widget
 	title := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(
 			e_image.NewNineSliceColor(color.NRGBA{70, 70, 70, 255}),
@@ -35,9 +24,25 @@ func createStatsWindow() (*widget.Window, *widget.Text) {
 		widget.TextOpts.Padding(&widget.Insets{Left: 4, Top: 1}),
 	))
 
+	// Create text widget. Content is modified later in game's Update()
+	statsText := widget.NewText(
+		widget.TextOpts.Text("", &bodyFace, color.White),
+		widget.TextOpts.Padding(&widget.Insets{Left: 4, Top: 1}),
+	)
+
+	// Create content container for text widget
+	content := widget.NewContainer(
+		widget.ContainerOpts.BackgroundImage(
+			e_image.NewNineSliceColor(color.NRGBA{40, 40, 40, 220}),
+		),
+		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+	)
+	content.AddChild(statsText)
+
+	// Create window
 	win := widget.NewWindow(
-		widget.WindowOpts.Contents(content),
 		widget.WindowOpts.TitleBar(title, 26),
+		widget.WindowOpts.Contents(content),
 		widget.WindowOpts.Draggable(),
 	)
 
