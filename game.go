@@ -45,11 +45,11 @@ type Game struct {
 // Create new game object
 func NewGame() *Game {
 	// Create two 2D arrays of equal size
-	g1 := make([][]bool, gHeight)
-	g2 := make([][]bool, gHeight)
-	for i := range gHeight {
-		g1[i] = make([]bool, gWidth)
-		g2[i] = make([]bool, gWidth)
+	g1 := make([][]bool, defaultGHeight)
+	g2 := make([][]bool, defaultGHeight)
+	for i := range defaultGHeight {
+		g1[i] = make([]bool, defaultGWidth)
+		g2[i] = make([]bool, defaultGWidth)
 	}
 
 	// Create new game struct in running state
@@ -57,10 +57,10 @@ func NewGame() *Game {
 		// Holds grid and rendering data
 		currentGrid: g1,
 		nextGrid:    g2,
-		gridWidth:   gWidth,
-		gridHeight:  gHeight,
-		image:       ebiten.NewImage(gWidth, gHeight),
-		pixels:      make([]byte, gWidth*gHeight*4),
+		gridWidth:   defaultGWidth,
+		gridHeight:  defaultGHeight,
+		image:       ebiten.NewImage(defaultGWidth, defaultGHeight),
+		pixels:      make([]byte, defaultGWidth*defaultGHeight*4),
 
 		// Simulation running by default
 		running: true,

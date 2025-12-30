@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	gWidth               = 100
-	gHeight              = 75
+	defaultGWidth        = 100
+	defaultGHeight       = 75
 	rWidth               = 1280
 	rHeight              = 960
 	wWidth               = 1000
