@@ -122,7 +122,7 @@ Draw dead cells: <right mouse button>`,
 }
 
 // Create floating window with width/height inputs and a Set button.
-func createSizeWindow(onSet func(width, height int)) *widget.Window {
+func createSizeWindow(onSet func(width, height int)) (*widget.Window, *widget.TextInput, *widget.TextInput) {
 	// Create title container and widget
 	title := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(
@@ -236,5 +236,5 @@ func createSizeWindow(onSet func(width, height int)) *widget.Window {
 		widget.WindowOpts.Draggable(),
 	)
 
-	return win
+	return win, widthInput, heightInput
 }

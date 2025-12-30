@@ -32,9 +32,11 @@ type Game struct {
 	currentFrameCount int
 
 	// Ui data
-	ui        *ebitenui.UI
-	uiVisible bool
-	statsTxt  *widget.Text
+	ui          *ebitenui.UI
+	uiVisible   bool
+	statsTxt    *widget.Text
+	widthInput  *widget.TextInput
+	heightInput *widget.TextInput
 
 	// Internal rendering resolution used by Ebiten
 	renderingWidth, renderingHeight int
@@ -164,7 +166,13 @@ func (g *Game) initUI() {
 	controlsWin := createControlsWindow()
 
 	// Create grid size window
-	gridWin := createSizeWindow(func(width, height int) {})
+	gridWin, widthInput, heightInput := createSizeWindow(func(width, height int) {})
+	g.widthInput = widthInput
+	g.heightInput = heightInput
+
+	// Set initial size window values
+	g.widthInput.SetText(fmt.Sprint(g.gridWidth))
+	g.heightInput.SetText(fmt.Sprint(g.gridHeight))
 
 	// Set window positions and sizes
 	statsWin.SetLocation(image.Rect(10, 10, 195, 107))
