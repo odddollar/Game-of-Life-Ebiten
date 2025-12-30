@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	gWidth             = 400
-	gHeight            = 300
+	gWidth             = 100
+	gHeight            = 75
 	probInitiallyAlive = 0.2
 	nSteppingSpeed     = 20
 	xSteppingSpeed     = 1

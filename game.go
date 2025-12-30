@@ -143,6 +143,17 @@ func (g *Game) Update() error {
 		}
 	}
 
+	// Toggle cells for drawing
+	x, y := ebiten.CursorPosition()
+	if x >= 0 && x < g.gridWidth && y >= 0 && y < g.gridHeight {
+		if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+			g.currentGrid[y][x] = true
+		}
+		if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+			g.currentGrid[y][x] = false
+		}
+	}
+
 	// Change stepping speed
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) && g.steppingSpeed > g.maxSteppingSpeed {
 		g.steppingSpeed--
@@ -150,7 +161,6 @@ func (g *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) && g.steppingSpeed < g.minSteppingSpeed {
 		g.steppingSpeed++
 	}
-	fmt.Println(g.steppingSpeed)
 
 	// Update grid
 	if g.running {
