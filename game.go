@@ -184,8 +184,8 @@ func (g *Game) initUI() {
 
 	// Set window positions and sizes
 	statsWin.SetLocation(image.Rect(10, 10, 195, 107))
-	controlsWin.SetLocation(image.Rect(10, 117, 398, 331))
-	gridWin.SetLocation(image.Rect(10, 341, 198, 485))
+	controlsWin.SetLocation(image.Rect(10, 117, 398, 352))
+	gridWin.SetLocation(image.Rect(10, 362, 198, 506))
 
 	// Add floating windows to ui
 	ui.AddWindow(statsWin)

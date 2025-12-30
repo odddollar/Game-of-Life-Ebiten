@@ -110,7 +110,8 @@ Clear simulation: <c>
 Increase simulation speed: <up arrow>
 Decrease simulation speed: <down arrow>
 Draw alive cells: <left mouse button>
-Draw dead cells: <right mouse button>`,
+Draw dead cells: <right mouse button>
+UI must be off to draw`,
 			&bodyFace, bodyTextColour),
 		widget.TextOpts.Padding(&widget.Insets{Left: 4, Top: 1}),
 	))
