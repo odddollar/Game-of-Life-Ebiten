@@ -140,6 +140,9 @@ func (g *Game) step() {
 func (g *Game) initUI() {
 	ui := &ebitenui.UI{}
 
+	// Load fonts to global variables
+	loadFonts()
+
 	// Create root container
 	ui.Container = widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(

@@ -1,11 +1,7 @@
 package main
 
 import (
-	"bytes"
-
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"golang.org/x/image/font/gofont/goregular"
 )
 
 const (
@@ -19,12 +15,6 @@ const (
 	nSteppingSpeed     = 20
 	xSteppingSpeed     = 1
 )
-
-// Load generic font with size
-func loadFont(size float64) text.Face {
-	s, _ := text.NewGoTextFaceSource(bytes.NewReader(goregular.TTF))
-	return &text.GoTextFace{Source: s, Size: size}
-}
 
 func main() {
 	// Setup game window
