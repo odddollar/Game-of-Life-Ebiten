@@ -13,10 +13,14 @@ import (
 
 // ImGui-like colours
 var (
-	titleBarColor  = color.NRGBA{55, 95, 165, 255}
-	windowBgColor  = color.NRGBA{28, 40, 65, 235}
-	titleTextColor = color.NRGBA{240, 245, 250, 255}
-	bodyTextColor  = color.NRGBA{215, 225, 235, 255}
+	titleBarColour      = color.NRGBA{55, 95, 165, 255}
+	windowBgColour      = color.NRGBA{28, 40, 65, 235}
+	titleTextColour     = color.NRGBA{240, 245, 250, 255}
+	bodyTextColour      = color.NRGBA{215, 225, 235, 255}
+	inputBgColour       = color.NRGBA{80, 90, 110, 255}
+	buttonIdleColour    = color.NRGBA{70, 100, 150, 255}
+	buttonHoverColour   = color.NRGBA{90, 120, 170, 255}
+	buttonPressedColour = color.NRGBA{50, 80, 130, 255}
 )
 
 // Fonts
@@ -42,25 +46,25 @@ func createStatsWindow() (*widget.Window, *widget.Text) {
 	// Create title container and widget
 	title := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(
-			e_image.NewNineSliceColor(titleBarColor),
+			e_image.NewNineSliceColor(titleBarColour),
 		),
 		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
 	)
 	title.AddChild(widget.NewText(
-		widget.TextOpts.Text("Statistics", &titleFace, titleTextColor),
+		widget.TextOpts.Text("Statistics", &titleFace, titleTextColour),
 		widget.TextOpts.Padding(&widget.Insets{Left: 4, Top: 1}),
 	))
 
 	// Create text widget. Content is modified later in game's Update()
 	statsText := widget.NewText(
-		widget.TextOpts.Text("", &bodyFace, bodyTextColor),
+		widget.TextOpts.Text("", &bodyFace, bodyTextColour),
 		widget.TextOpts.Padding(&widget.Insets{Left: 4, Top: 1}),
 	)
 
 	// Create content container for text widget
 	content := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(
-			e_image.NewNineSliceColor(windowBgColor),
+			e_image.NewNineSliceColor(windowBgColour),
 		),
 		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
 	)
@@ -81,19 +85,19 @@ func createControlsWindow() *widget.Window {
 	// Create title container and widget
 	title := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(
-			e_image.NewNineSliceColor(titleBarColor),
+			e_image.NewNineSliceColor(titleBarColour),
 		),
 		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
 	)
 	title.AddChild(widget.NewText(
-		widget.TextOpts.Text("Controls", &titleFace, titleTextColor),
+		widget.TextOpts.Text("Controls", &titleFace, titleTextColour),
 		widget.TextOpts.Padding(&widget.Insets{Left: 4, Top: 1}),
 	))
 
 	// Create content container for text widget
 	content := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(
-			e_image.NewNineSliceColor(windowBgColor),
+			e_image.NewNineSliceColor(windowBgColour),
 		),
 		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
 	)
@@ -107,7 +111,7 @@ Increase simulation speed: <up arrow>
 Decrease simulation speed: <down arrow>
 Draw alive cells: <left mouse button>
 Draw dead cells: <right mouse button>`,
-			&bodyFace, bodyTextColor),
+			&bodyFace, bodyTextColour),
 		widget.TextOpts.Padding(&widget.Insets{Left: 4, Top: 1}),
 	))
 
@@ -126,12 +130,12 @@ func createSizeWindow(onSet func(width, height int)) (*widget.Window, *widget.Te
 	// Create title container and widget
 	title := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(
-			e_image.NewNineSliceColor(titleBarColor),
+			e_image.NewNineSliceColor(titleBarColour),
 		),
 		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
 	)
 	title.AddChild(widget.NewText(
-		widget.TextOpts.Text("Set Grid Size", &titleFace, titleTextColor),
+		widget.TextOpts.Text("Set Grid Size", &titleFace, titleTextColour),
 		widget.TextOpts.Padding(&widget.Insets{Left: 4, Top: 1}),
 	))
 
@@ -158,12 +162,12 @@ func createSizeWindow(onSet func(width, height int)) (*widget.Window, *widget.Te
 			widget.TextInputOpts.Face(&bodyFace),
 			widget.TextInputOpts.Padding(widget.NewInsetsSimple(4)),
 			widget.TextInputOpts.Image(&widget.TextInputImage{
-				Idle:     e_image.NewNineSliceColor(color.NRGBA{80, 90, 110, 255}),
-				Disabled: e_image.NewNineSliceColor(color.NRGBA{80, 90, 110, 255}),
+				Idle:     e_image.NewNineSliceColor(inputBgColour),
+				Disabled: e_image.NewNineSliceColor(inputBgColour),
 			}),
 			widget.TextInputOpts.Color(&widget.TextInputColor{
-				Idle:  bodyTextColor,
-				Caret: bodyTextColor,
+				Idle:  bodyTextColour,
+				Caret: bodyTextColour,
 			}),
 			widget.TextInputOpts.Validation(intValidation),
 		)
@@ -176,7 +180,7 @@ func createSizeWindow(onSet func(width, height int)) (*widget.Window, *widget.Te
 			)),
 		)
 		row.AddChild(widget.NewText(
-			widget.TextOpts.Text(label, &bodyFace, bodyTextColor),
+			widget.TextOpts.Text(label, &bodyFace, bodyTextColour),
 			widget.TextOpts.Padding(&widget.Insets{Left: 2, Top: 4}),
 		))
 		row.AddChild(input)
@@ -191,12 +195,12 @@ func createSizeWindow(onSet func(width, height int)) (*widget.Window, *widget.Te
 	// Create set button widget
 	setButton := widget.NewButton(
 		widget.ButtonOpts.Image(&widget.ButtonImage{
-			Idle:    e_image.NewNineSliceColor(color.NRGBA{70, 100, 150, 255}),
-			Hover:   e_image.NewNineSliceColor(color.NRGBA{90, 120, 170, 255}),
-			Pressed: e_image.NewNineSliceColor(color.NRGBA{50, 80, 130, 255}),
+			Idle:    e_image.NewNineSliceColor(buttonIdleColour),
+			Hover:   e_image.NewNineSliceColor(buttonHoverColour),
+			Pressed: e_image.NewNineSliceColor(buttonPressedColour),
 		}),
 		widget.ButtonOpts.Text("Set", &bodyFace, &widget.ButtonTextColor{
-			Idle: bodyTextColor,
+			Idle: bodyTextColour,
 		}),
 		widget.ButtonOpts.TextPadding(&widget.Insets{
 			Left:   16,
@@ -217,7 +221,7 @@ func createSizeWindow(onSet func(width, height int)) (*widget.Window, *widget.Te
 	// Create main content layout
 	content := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(
-			e_image.NewNineSliceColor(windowBgColor),
+			e_image.NewNineSliceColor(windowBgColour),
 		),
 		widget.ContainerOpts.Layout(widget.NewRowLayout(
 			widget.RowLayoutOpts.Direction(widget.DirectionVertical),
