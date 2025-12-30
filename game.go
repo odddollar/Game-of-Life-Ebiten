@@ -32,8 +32,9 @@ type Game struct {
 	currentFrameCount int
 
 	// Ui data
-	ui       *ebitenui.UI
-	statsTxt *widget.Text
+	ui        *ebitenui.UI
+	uiVisible bool
+	statsTxt  *widget.Text
 
 	// Internal rendering resolution used by Ebiten
 	renderingWidth, renderingHeight int
@@ -63,6 +64,7 @@ func NewGame() *Game {
 		minSteppingSpeed:  nSteppingSpeed,
 		maxSteppingSpeed:  xSteppingSpeed,
 		currentFrameCount: 1,
+		uiVisible:         true,
 		renderingWidth:    rWidth,
 		renderingHeight:   rHeight,
 	}
@@ -218,6 +220,11 @@ func (g *Game) Update() error {
 		g.steppingSpeed++
 	}
 
+	// Toggle ui visibility
+	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
+		g.uiVisible = !g.uiVisible
+	}
+
 	// Update grid
 	if g.running {
 		if g.currentFrameCount%g.steppingSpeed == 0 {
@@ -228,7 +235,10 @@ func (g *Game) Update() error {
 		}
 	}
 
-	g.ui.Update()
+	// Update ui if visible
+	if g.uiVisible {
+		g.ui.Update()
+	}
 
 	return nil
 }
@@ -269,8 +279,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	screen.DrawImage(g.image, op)
 
-	// Draw ui on top
-	g.ui.Draw(screen)
+	// Draw ui on top if visible
+	if g.uiVisible {
+		g.ui.Draw(screen)
+	}
 }
 
 // Set internal canvas size/rendering resolution
