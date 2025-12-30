@@ -2,24 +2,41 @@ package main
 
 import (
 	"fmt"
+	"image"
+	"image/color"
 	"math/rand/v2"
 
+	"github.com/ebitenui/ebitenui"
+	e_image "github.com/ebitenui/ebitenui/image"
+	"github.com/ebitenui/ebitenui/widget"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 // Game struct to hold current state
 type Game struct {
+	// Holds grid and rendering data
 	currentGrid           [][]bool
 	nextGrid              [][]bool
 	gridWidth, gridHeight int
 	image                 *ebiten.Image
 	pixels                []byte
-	running               bool
-	steppingSpeed         int
-	minSteppingSpeed      int
-	maxSteppingSpeed      int
-	currentFrameCount     int
+
+	// Simulation paused or not
+	running bool
+
+	// Speed of simulation
+	steppingSpeed     int
+	minSteppingSpeed  int
+	maxSteppingSpeed  int
+	currentFrameCount int
+
+	// Ui data
+	ui       *ebitenui.UI
+	statsTxt *widget.Text
+
+	// Internal rendering resolution used by Ebiten
+	renderingWidth, renderingHeight int
 }
 
 // Create new game object
@@ -46,8 +63,13 @@ func NewGame() *Game {
 		minSteppingSpeed:  nSteppingSpeed,
 		maxSteppingSpeed:  xSteppingSpeed,
 		currentFrameCount: 1,
+		renderingWidth:    rWidth,
+		renderingHeight:   rHeight,
 	}
 	g.initialiseRandomAlivePositions()
+
+	// Initialise ui
+	g.initUI()
 
 	return g
 }
@@ -91,7 +113,7 @@ func (g *Game) numNeighbours(x, y int) int {
 	return neighbours
 }
 
-// Step to next state
+// Step to next simulation state
 func (g *Game) step() {
 	// Iterate through each grid position
 	for y := range g.gridHeight {
@@ -114,15 +136,41 @@ func (g *Game) step() {
 	g.currentGrid, g.nextGrid = g.nextGrid, g.currentGrid
 }
 
+// Initialise overlay ui elements
+func (g *Game) initUI() {
+	ui := &ebitenui.UI{}
+
+	// Create root container
+	ui.Container = widget.NewContainer(
+		widget.ContainerOpts.BackgroundImage(
+			e_image.NewNineSliceColor(color.NRGBA{0, 0, 0, 0}),
+		),
+		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+	)
+
+	// Assign ui object to game's ui field
+	g.ui = ui
+
+	// Create stats window widgets
+	statsWin, statsText := createStatsWindow()
+	g.statsTxt = statsText
+
+	// Set widow position and size
+	statsWin.SetLocation(image.Rect(10, 10, 195, 107))
+
+	// Add floating windows to ui
+	ui.AddWindow(statsWin)
+}
+
 // Update current game frame
 func (g *Game) Update() error {
-	// Update window title with TPS/FPS
-	ebiten.SetWindowTitle(fmt.Sprintf(
-		"Game of Life (Ebitengine) (Stepping Speed: %d) (FPS: %.2f, TPS: %.2f)",
-		g.steppingSpeed,
+	// Update ui stats window text
+	g.statsTxt.Label = fmt.Sprintf(
+		"FPS: %.2f\nTPS: %.2f\nStepping Speed: %d",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
-	))
+		g.steppingSpeed,
+	)
 
 	// Toggle pause input
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
@@ -172,6 +220,8 @@ func (g *Game) Update() error {
 		}
 	}
 
+	g.ui.Update()
+
 	return nil
 }
 
@@ -188,6 +238,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				continue
 			}
 
+			// Set pixels in buffer to white
 			i := (gridY*g.gridWidth + gridX) * 4
 			g.pixels[i+0] = 255
 			g.pixels[i+1] = 255
@@ -199,7 +250,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Write pixel array to image
 	g.image.WritePixels(g.pixels)
 
-	// Calculate scaling factors
+	// Calculate scaling factors to maximise image
 	sw, sh := screen.Bounds().Dx(), screen.Bounds().Dy()
 	scaleX := float64(sw) / float64(g.gridWidth)
 	scaleY := float64(sh) / float64(g.gridHeight)
@@ -208,10 +259,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(scaleX, scaleY)
 
-	screen.DrawImage(g.image, nil)
+	screen.DrawImage(g.image, op)
+
+	// Draw ui on top
+	g.ui.Draw(screen)
 }
 
-// Set internal canvas size
+// Set internal canvas size/rendering resolution
 func (g *Game) Layout(_, _ int) (int, int) {
-	return g.gridWidth, g.gridHeight
+	return g.renderingWidth, g.renderingHeight
 }
