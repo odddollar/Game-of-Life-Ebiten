@@ -163,13 +163,18 @@ func (g *Game) initUI() {
 	// Create controls window
 	controlsWin := createControlsWindow()
 
+	// Create grid size window
+	gridWin := createSizeWindow(func(width, height int) {})
+
 	// Set window positions and sizes
 	statsWin.SetLocation(image.Rect(10, 10, 195, 107))
 	controlsWin.SetLocation(image.Rect(10, 117, 398, 331))
+	gridWin.SetLocation(image.Rect(10, 341, 198, 485))
 
 	// Add floating windows to ui
 	ui.AddWindow(statsWin)
 	ui.AddWindow(controlsWin)
+	ui.AddWindow(gridWin)
 }
 
 // Update current game frame
