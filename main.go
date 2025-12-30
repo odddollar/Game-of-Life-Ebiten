@@ -7,15 +7,16 @@ import (
 )
 
 const (
-	gWidth             = 100
-	gHeight            = 75
-	rWidth             = 1280
-	rHeight            = 960
-	wWidth             = 1000
-	wHeight            = 750
-	probInitiallyAlive = 0.2
-	nSteppingSpeed     = 20
-	xSteppingSpeed     = 1
+	gWidth               = 100
+	gHeight              = 75
+	rWidth               = 1280
+	rHeight              = 960
+	wWidth               = 1000
+	wHeight              = 750
+	probInitiallyAlive   = 0.2
+	defaultSteppingSpeed = 10
+	nSteppingSpeed       = 20
+	xSteppingSpeed       = 1
 )
 
 func main() {

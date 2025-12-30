@@ -47,7 +47,6 @@ func NewGame() *Game {
 	// Create two 2D arrays of equal size
 	g1 := make([][]bool, gHeight)
 	g2 := make([][]bool, gHeight)
-
 	for i := range gHeight {
 		g1[i] = make([]bool, gWidth)
 		g2[i] = make([]bool, gWidth)
@@ -55,20 +54,29 @@ func NewGame() *Game {
 
 	// Create new game struct in running state
 	g := &Game{
-		currentGrid:       g1,
-		nextGrid:          g2,
-		gridWidth:         gWidth,
-		gridHeight:        gHeight,
-		image:             ebiten.NewImage(gWidth, gHeight),
-		pixels:            make([]byte, gWidth*gHeight*4),
-		running:           true,
-		steppingSpeed:     10,
+		// Holds grid and rendering data
+		currentGrid: g1,
+		nextGrid:    g2,
+		gridWidth:   gWidth,
+		gridHeight:  gHeight,
+		image:       ebiten.NewImage(gWidth, gHeight),
+		pixels:      make([]byte, gWidth*gHeight*4),
+
+		// Simulation running by default
+		running: true,
+
+		// Speed of simulation
+		steppingSpeed:     defaultSteppingSpeed,
 		minSteppingSpeed:  nSteppingSpeed,
 		maxSteppingSpeed:  xSteppingSpeed,
 		currentFrameCount: 1,
-		uiVisible:         true,
-		renderingWidth:    rWidth,
-		renderingHeight:   rHeight,
+
+		// Ui visible by default
+		uiVisible: true,
+
+		// Internal rendering resolution used by Ebiten
+		renderingWidth:  rWidth,
+		renderingHeight: rHeight,
 	}
 	g.initialiseRandomAlivePositions()
 
@@ -166,7 +174,7 @@ func (g *Game) initUI() {
 	controlsWin := createControlsWindow()
 
 	// Create grid size window
-	gridWin, widthInput, heightInput := createSizeWindow(func(width, height int) {})
+	gridWin, widthInput, heightInput := createSizeWindow(g.setGridSize)
 	g.widthInput = widthInput
 	g.heightInput = heightInput
 
@@ -183,6 +191,30 @@ func (g *Game) initUI() {
 	ui.AddWindow(statsWin)
 	ui.AddWindow(controlsWin)
 	ui.AddWindow(gridWin)
+}
+
+// Set grid size
+func (g *Game) setGridSize(width, height int) {
+	// Create two 2D arrays of equal size
+	g1 := make([][]bool, height)
+	g2 := make([][]bool, height)
+	for i := range height {
+		g1[i] = make([]bool, width)
+		g2[i] = make([]bool, width)
+	}
+
+	// Update in-memory grids
+	g.currentGrid = g1
+	g.nextGrid = g2
+	g.gridWidth = width
+	g.gridHeight = height
+
+	// Re-randomise grid
+	g.initialiseRandomAlivePositions()
+
+	// Recreate images for rendering
+	g.image = ebiten.NewImage(width, height)
+	g.pixels = make([]byte, width*height*4)
 }
 
 // Update current game frame
