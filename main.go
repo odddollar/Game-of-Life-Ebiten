@@ -1,6 +1,8 @@
 package main
 
 import (
+	"image"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -21,6 +23,7 @@ func main() {
 	ebiten.SetWindowTitle("Game of Life (Ebiten) (Press <p> to toggle UI)")
 	ebiten.SetWindowSize(wWidth, wHeight)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
+	ebiten.SetWindowIcon([]image.Image{loadWindowIcon()})
 
 	// Run game
 	if err := ebiten.RunGame(NewGame()); err != nil {

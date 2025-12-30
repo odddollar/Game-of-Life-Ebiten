@@ -1,3 +1,4 @@
 *.exe
 *.upx
+*.syso
 build.bat

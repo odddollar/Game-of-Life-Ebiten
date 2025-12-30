@@ -100,8 +100,8 @@ func createControlsWindow() *widget.Window {
 		widget.TextOpts.Text(
 			`Toggle UI: <p>
 Pause simulation: <space>
-Randomise grid: <r>
-Clear grid: <c>
+Randomise simulation: <r>
+Clear simulation: <c>
 Increase simulation speed: <up arrow>
 Decrease simulation speed: <down arrow>
 Draw alive cells: <left mouse button>
