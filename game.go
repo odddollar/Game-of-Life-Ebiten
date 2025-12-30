@@ -202,13 +202,22 @@ func (g *Game) Update() error {
 	}
 
 	// Toggle cells for drawing
-	x, y := ebiten.CursorPosition()
-	if x >= 0 && x < g.gridWidth && y >= 0 && y < g.gridHeight {
-		if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
-			g.currentGrid[y][x] = true
-		}
-		if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
-			g.currentGrid[y][x] = false
+	if !g.uiVisible {
+		mx, my := ebiten.CursorPosition()
+
+		// Convert mouse position to grid coordinates
+		scaleX := float64(g.renderingWidth) / float64(g.gridWidth)
+		scaleY := float64(g.renderingHeight) / float64(g.gridHeight)
+		gx := int(float64(mx) / scaleX)
+		gy := int(float64(my) / scaleY)
+
+		if gx >= 0 && gx < g.gridWidth && gy >= 0 && gy < g.gridHeight {
+			if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+				g.currentGrid[gy][gx] = true
+			}
+			if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+				g.currentGrid[gy][gx] = false
+			}
 		}
 	}
 
