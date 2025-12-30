@@ -158,11 +158,16 @@ func (g *Game) initUI() {
 	statsWin, statsText := createStatsWindow()
 	g.statsTxt = statsText
 
-	// Set widow position and size
+	// Create controls window
+	controlsWin := createControlsWindow()
+
+	// Set window positions and sizes
 	statsWin.SetLocation(image.Rect(10, 10, 195, 107))
+	controlsWin.SetLocation(image.Rect(10, 117, 398, 331))
 
 	// Add floating windows to ui
 	ui.AddWindow(statsWin)
+	ui.AddWindow(controlsWin)
 }
 
 // Update current game frame

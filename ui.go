@@ -74,3 +74,48 @@ func createStatsWindow() (*widget.Window, *widget.Text) {
 
 	return win, statsText
 }
+
+// Create floating window with control scheme
+func createControlsWindow() *widget.Window {
+	// Create title container and widget
+	title := widget.NewContainer(
+		widget.ContainerOpts.BackgroundImage(
+			e_image.NewNineSliceColor(titleBarColor),
+		),
+		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+	)
+	title.AddChild(widget.NewText(
+		widget.TextOpts.Text("Controls", &titleFace, titleTextColor),
+		widget.TextOpts.Padding(&widget.Insets{Left: 4, Top: 1}),
+	))
+
+	// Create content container for text widget
+	content := widget.NewContainer(
+		widget.ContainerOpts.BackgroundImage(
+			e_image.NewNineSliceColor(windowBgColor),
+		),
+		widget.ContainerOpts.Layout(widget.NewAnchorLayout()),
+	)
+	content.AddChild(widget.NewText(
+		widget.TextOpts.Text(
+			`Toggle UI: <p>
+Pause simulation: <space>
+Randomise grid: <r>
+Clear grid: <c>
+Increase simulation speed: <up arrow>
+Decrease simulation speed: <down arrow>
+Draw alive cells: <left mouse button>
+Draw dead cells: <right mouse button>`,
+			&bodyFace, bodyTextColor),
+		widget.TextOpts.Padding(&widget.Insets{Left: 4, Top: 1}),
+	))
+
+	// Create window
+	win := widget.NewWindow(
+		widget.WindowOpts.TitleBar(title, 26),
+		widget.WindowOpts.Contents(content),
+		widget.WindowOpts.Draggable(),
+	)
+
+	return win
+}
