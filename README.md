@@ -8,6 +8,8 @@ The game creates a grid of cells that are randomly initialised to either **Alive
 2. If a **Dead** cell has exactly 3 living neighbours it becomes **Alive**
 3. If an **Alive** cell has 2 or 3 living neighbours it continues living in the next generation
 
+An online hosted build of this game is available [here](https://odddollar.github.io/Game-of-Life-Ebiten/).
+
 ## Features
 
 - Graphical display of simulation state
@@ -18,7 +20,7 @@ The game creates a grid of cells that are randomly initialised to either **Alive
 
 ## Building
 
-The following script can be used to build the program with icons for Windows:
+The following commands can be used to build the program with icons for Windows:
 
 ```bat
 go install github.com/tc-hib/go-winres@latest
