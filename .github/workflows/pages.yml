@@ -1,0 +1,90 @@
+name: Deploy WASM build to GitHub Pages
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      GO_VERSION: "1.25.4"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build WASM
+        run: |
+          mkdir -p dist
+
+          GOOS=js GOARCH=wasm go build \
+            -o dist/game.wasm \
+            .
+
+          cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" dist/
+          cp assets/icon.png dist/favicon.png
+
+      - name: Create index.html
+        run: |
+          cat > dist/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Game of Life (Ebiten)</title>
+            <link rel="icon" type="image/png" href="favicon.png">
+          </head>
+          <body>
+            <script src="wasm_exec.js"></script>
+            <script>
+              const go = new Go();
+
+              WebAssembly.instantiateStreaming(
+                fetch("game.wasm"),
+                go.importObject
+              ).then((result) => {
+                go.run(result.instance);
+              });
+            </script>
+          </body>
+          </html>
+          EOF
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
