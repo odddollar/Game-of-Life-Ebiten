@@ -224,7 +224,7 @@ func (g *Game) Update() error {
 		"FPS: %.2f\nTPS: %.2f\nStepping Speed: %d",
 		ebiten.ActualFPS(),
 		ebiten.ActualTPS(),
-		g.steppingSpeed,
+		g.minSteppingSpeed-g.steppingSpeed+1,
 	)
 
 	// Toggle pause input

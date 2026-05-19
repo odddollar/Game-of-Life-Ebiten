@@ -14,7 +14,7 @@ const (
 	wWidth               = 1000
 	wHeight              = 750
 	probInitiallyAlive   = 0.2
-	defaultSteppingSpeed = 10
+	defaultSteppingSpeed = 11
 	nSteppingSpeed       = 20
 	xSteppingSpeed       = 1
 )
